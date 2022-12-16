@@ -7,7 +7,7 @@ function createFiltersFormTemplate() {
   );
 }
 
-export default class ListPointsView {
+export default class ListRoutePointsView {
   getTemplate() {
     return createFiltersFormTemplate();
   }

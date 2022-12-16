@@ -1,5 +1,5 @@
-import FiltersFormView from './view/filters-view';
-import FormSortView from './view/sorting-view';
+import FiltersFormView from './view/filters-form-view';
+import FormSortView from './view/form-sort-view';
 import {render} from './render.js';
 import BoardPresenter from './presenter/board-presenter.js';
 
