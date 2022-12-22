@@ -1,7 +1,3 @@
-export const offersByType = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-
-export const propetys = ['health insurance', 'priority boarding', 'the "Refund" service', 'business hall', 'trip cancellation insurance', 'special luggage', 'animal in the salon', 'SMS-info', 'special support', 'extra baggage'];
-
 export const PICTURES = [
   {src: 'img/photos/1.jpg', description: 'Chamonix parliament building'},
   {src: 'img/photos/2.jpg', description: 'Chamonix parliament building'},

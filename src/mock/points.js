@@ -1,11 +1,11 @@
-import { offersByType} from './mocks-const';
+import { OFFES_BY_TYPE} from '../const/const';
 import { offersListByType} from './offer';
 import {getRandomArrayElement, getRandomNumber} from './utils-mock';
 
 export const getPoint = (lengthOfArray) => {
   const arrayPoints = [];
   while (arrayPoints.length < lengthOfArray) {
-    const typeOfOffers = getRandomArrayElement(offersByType);
+    const typeOfOffers = getRandomArrayElement(OFFES_BY_TYPE);
     const allOffersForType = offersListByType.find((obj) => obj.type === typeOfOffers).offers.map((offer) => offer.id);
 
     const offersChekid = () => {

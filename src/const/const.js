@@ -1,5 +1,5 @@
 export const COUNT_POINTS = 4;
 
-export const offersPyType = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+export const OFFES_BY_TYPE = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
-export const propetys = ['health insurance', 'priority boarding', 'the "Refund" service', 'business hall', 'trip cancellation insurance', 'special luggage', 'animal in the salon', 'SMS-info', 'special support', 'extra baggage'];
+export const PROPETYS = ['health insurance', 'priority boarding', 'the "Refund" service', 'business hall', 'trip cancellation insurance', 'special luggage', 'animal in the salon', 'SMS-info', 'special support', 'extra baggage'];

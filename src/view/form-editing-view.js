@@ -1,8 +1,5 @@
 import {createElement} from '../render.js';
-import { humanizeTimeFromTo, humanizeTravelDayForEditing} from '../mock/utils-mock';
-//import {offersListByType} from '../mock/offer';
-//import {destinations} from '../mock/destinstion';
-
+import { humanizeTimeFromTo, humanizeTravelDayForEditing} from '../utils/utils';
 
 function createPhotosTape(srcPhoto) {
   return (

@@ -1,4 +1,4 @@
-import { propetys, offersByType} from './mocks-const';
+import { PROPETYS, OFFES_BY_TYPE} from '../const/const';
 import {getRandomArrayElement, getRandomNumber} from './utils-mock';
 
 
@@ -8,7 +8,7 @@ const getOffers = () => {
   while (arrayOffers.length < lengthOfArray) {
     const el = {
       id: arrayOffers.length,
-      title: getRandomArrayElement(propetys),
+      title: getRandomArrayElement(PROPETYS),
       price: getRandomNumber(10, 400),
     };
     arrayOffers.push(el);
@@ -18,11 +18,10 @@ const getOffers = () => {
 
 export const offersList = getOffers();
 
-export const getOffersByType = () => offersByType.map((offer, id) => ({
+export const getOffersByType = () => OFFES_BY_TYPE.map((offer, id) => ({
   type: offer,
   offers: offersList.slice(id * Math.floor(offersList.length / 10), (id + 1) * Math.floor(offersList.length / 10)),
 }));
 
 export const offersListByType = getOffersByType();
-
 

@@ -1,7 +1,5 @@
 import {createElement} from '../render.js';
-import {humanizeTravelDay, humanizeTimeFromTo, humanizeTravelTime} from '../mock/utils-mock';
-//import {offersList} from '../mock/offer';
-//import {destinations} from '../mock/destinstion';
+import {humanizeTravelDay, humanizeTimeFromTo, humanizeTravelTime} from '../utils/utils';
 
 
 function createOffersTemplate(offer) {
