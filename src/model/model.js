@@ -5,24 +5,24 @@ import {offersList, offersListByType} from '../mock/offer';
 
 
 export default class PointsModel {
-  point = getPoint(COUNT_POINTS);
-  destinations = destinations;
-  offersList = offersList;
-  offersListByType = offersListByType;
+  #point = getPoint(COUNT_POINTS);
+  #destinations = destinations;
+  #offersList = offersList;
+  #offersListByType = offersListByType;
 
-  getPoints() {
-    return this.point;
+  get points() {
+    return this.#point;
   }
 
-  getDestinations() {
-    return this.destinations;
+  get destinations() {
+    return this.#destinations;
   }
 
-  getOffers() {
-    return this.offersList;
+  get offers() {
+    return this.#offersList;
   }
 
-  getByOffers() {
-    return this.offersListByType;
+  get offersByType() {
+    return this.#offersListByType;
   }
 }

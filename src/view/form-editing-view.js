@@ -153,26 +153,32 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
 }
 
 export default class FormEditingView {
+  #element = null;
+  #point = null;
+  #destinations = null;
+  #offersList = null;
+  #offersListByType = null;
+
   constructor ({point, destinations, offersList, offersListByType}) {
-    this.point = point;
-    this.destinations = destinations;
-    this.offersList = offersList;
-    this.offersListByType = offersListByType;
+    this.#point = point;
+    this.#destinations = destinations;
+    this.#offersList = offersList;
+    this.#offersListByType = offersListByType;
   }
 
-  getTemplate() {
-    return createFiltersFormTemplate(this.point, this.destinations, this.offersList, this.offersListByType);
+  get template() {
+    return createFiltersFormTemplate(this.#point, this.#destinations, this.#offersList, this.#offersListByType);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

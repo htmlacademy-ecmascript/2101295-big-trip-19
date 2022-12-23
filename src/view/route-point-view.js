@@ -64,25 +64,31 @@ function createRoutePointTemplate(point, destinations, offersList) {
 }
 
 export default class RoutePointView {
+  #element = null;
+  #point = null;
+  #destinations = null;
+  #offersList = null;
+
+
   constructor({point, destinations, offersList}) {
-    this.point = point;
-    this.destinations = destinations;
-    this.offersList = offersList;
+    this.#point = point;
+    this.#destinations = destinations;
+    this.#offersList = offersList;
   }
 
-  getTemplate() {
-    return createRoutePointTemplate(this.point, this.destinations, this.offersList);
+  get template() {
+    return createRoutePointTemplate(this.#point, this.#destinations, this.#offersList);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
