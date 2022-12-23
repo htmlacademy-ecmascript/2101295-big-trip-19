@@ -35,7 +35,8 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
   const selectedDestination = destinations.find((el) => el.id === destination);
 
   return (
-    `<form class="event event--edit" action="#" method="post">
+    `<li class="trip-events__item">
+    <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -148,7 +149,8 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
             </div>
         </section>
       </section>
-    </form>`
+    </form>
+    </li>`
   );
 }
 
