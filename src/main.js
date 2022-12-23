@@ -2,7 +2,7 @@ import FiltersFormView from './view/filters-form-view';
 import FormSortView from './view/form-sort-view';
 import {render} from './render.js';
 import BoardPresenter from './presenter/board-presenter.js';
-import PointsModel from './model/model';
+import PointsModel from './model/points-model';
 
 
 const siteCotentPlace = document.querySelector('.trip-events');
