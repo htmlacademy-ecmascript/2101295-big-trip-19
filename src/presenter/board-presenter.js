@@ -1,29 +1,73 @@
 import FormEditingView from '../view/form-editing-view';
 import ListPointsView from '../view/list-route-points';
 import RoutePointView from '../view/route-point-view';
-import FormCreateView from '../view/form-create-view';
+//import FormCreateView from '../view/form-create-view';
 import {render} from '../render.js';
 
 export default class BoardPresenter {
-  listPointsComponent = new ListPointsView();
+  #listPointsComponent = new ListPointsView();
+  #boardContainer = null;
+  #pointsModel = null;
+  #boardOffers = null;
+  #destinations = null;
+  #offersList = null;
+  #offersListByType = null;
+
 
   constructor({boardContainer, pointsModel}) {
-    this.boardContainer = boardContainer;
-    this.pointsModel = pointsModel;
+    this.#boardContainer = boardContainer;
+    this.#pointsModel = pointsModel;
   }
 
   init() {
-    this.boardOffers = [...this.pointsModel.getPoints()];
-    this.destinations = [...this.pointsModel.getDestinations()];
-    this.offersList = [...this.pointsModel.getOffers()];
-    this.offersListByType = [...this.pointsModel.getByOffers()];
+    this.#boardOffers = [...this.#pointsModel.points];
+    this.#destinations = [...this.#pointsModel.destinations];
+    this.#offersList = [...this.#pointsModel.offers];
+    this.#offersListByType = [...this.#pointsModel.offersByType];
 
-    render(this.listPointsComponent, this.boardContainer);
-    render(new FormEditingView({point: this.boardOffers[0], destinations: this.destinations, offersList: this.offersList, offersListByType: this.offersListByType}), this.listPointsComponent.getElement());
-    render(new FormCreateView(), this.listPointsComponent.getElement());
+    render(this.#listPointsComponent, this.#boardContainer);
+    //render(new FormEditingView({point: this.#boardOffers[0], destinations: this.#destinations, offersList: this.#offersList, offersListByType: this.#offersListByType}), this.#listPointsComponent.element);
+    //render(new FormCreateView(), this.#listPointsComponent.element);
 
-    for (let i = 1; i < this.boardOffers.length; i++) {
-      render(new RoutePointView({point: this.boardOffers[i], destinations: this.destinations, offersList: this.offersList}), this.listPointsComponent.getElement());
+    for (let i = 0; i < this.#boardOffers.length; i++) {
+      this.#renderRoutePoint({point: this.#boardOffers[i], destinations: this.#destinations, offersList: this.#offersList, offersListByType: this.#offersListByType});
     }
+  }
+
+  #renderRoutePoint({point, destinations, offersList, offersListByType}) {
+    const routePoint = new RoutePointView({point, destinations, offersList});
+    const formEditingPoint = new FormEditingView({point, destinations, offersList, offersListByType});
+
+    const replacePointToForm = () => {
+      this.#listPointsComponent.element.replaceChild(formEditingPoint.element, routePoint.element);
+    };
+
+    const replaceFormToPoint = () => {
+      this.#listPointsComponent.element.replaceChild(routePoint.element, formEditingPoint.element);
+    };
+
+    const escKeyDownHandler = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        evt.preventDefault();
+        replaceFormToPoint();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
+
+    routePoint.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      replacePointToForm();
+      document.addEventListener('keydown', escKeyDownHandler);
+    });
+
+    formEditingPoint.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      replaceFormToPoint();
+    });
+
+    formEditingPoint.element.querySelector('.event--edit').addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      replaceFormToPoint();
+    });
+
+    render(routePoint, this.#listPointsComponent.element);
   }
 }

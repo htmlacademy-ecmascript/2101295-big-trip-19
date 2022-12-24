@@ -35,7 +35,8 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
   const selectedDestination = destinations.find((el) => el.id === destination);
 
   return (
-    `<form class="event event--edit" action="#" method="post">
+    `<li class="trip-events__item">
+    <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -148,31 +149,38 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
             </div>
         </section>
       </section>
-    </form>`
+    </form>
+    </li>`
   );
 }
 
 export default class FormEditingView {
+  #element = null;
+  #point = null;
+  #destinations = null;
+  #offersList = null;
+  #offersListByType = null;
+
   constructor ({point, destinations, offersList, offersListByType}) {
-    this.point = point;
-    this.destinations = destinations;
-    this.offersList = offersList;
-    this.offersListByType = offersListByType;
+    this.#point = point;
+    this.#destinations = destinations;
+    this.#offersList = offersList;
+    this.#offersListByType = offersListByType;
   }
 
-  getTemplate() {
-    return createFiltersFormTemplate(this.point, this.destinations, this.offersList, this.offersListByType);
+  get template() {
+    return createFiltersFormTemplate(this.#point, this.#destinations, this.#offersList, this.#offersListByType);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

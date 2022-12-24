@@ -148,20 +148,21 @@ function createFormCreateView() {
 }
 
 export default class FormCreateView {
+  #element = null;
 
-  getTemplate() {
+  get template() {
     return createFormCreateView();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
