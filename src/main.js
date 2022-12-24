@@ -8,10 +8,11 @@ import PointsModel from './model/points-model';
 const siteCotentPlace = document.querySelector('.trip-events');
 const siteHeaderElement = document.querySelector('.trip-controls__filters');
 
+render(new FormSortView(), siteCotentPlace);
+render(new FiltersFormView(), siteHeaderElement);
+
 const pointsModel = new PointsModel();
 const boardPresenter = new BoardPresenter({boardContainer: siteCotentPlace, pointsModel});
 
-render(new FormSortView(), siteCotentPlace);
-render(new FiltersFormView(), siteHeaderElement);
 
 boardPresenter.init();
