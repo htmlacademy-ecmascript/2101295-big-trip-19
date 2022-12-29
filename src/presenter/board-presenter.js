@@ -21,7 +21,7 @@ export default class BoardPresenter {
   }
 
   init() {
-    if (this.#pointsModel.point) {
+    if (this.#pointsModel.points) {
       this.#boardOffers = [...this.#pointsModel.points];
       this.#destinations = [...this.#pointsModel.destinations];
       this.#offersList = [...this.#pointsModel.offers];

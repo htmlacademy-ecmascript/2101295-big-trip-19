@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { humanizeTimeFromTo, humanizeTravelDayForEditing} from '../utils/utils';
 
 function createPhotosTape(srcPhoto) {
@@ -154,14 +154,14 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
   );
 }
 
-export default class FormEditingView {
-  #element = null;
+export default class FormEditingView extends AbstractView {
   #point = null;
   #destinations = null;
   #offersList = null;
   #offersListByType = null;
 
   constructor ({point, destinations, offersList, offersListByType}) {
+    super();
     this.#point = point;
     this.#destinations = destinations;
     this.#offersList = offersList;
@@ -170,17 +170,5 @@ export default class FormEditingView {
 
   get template() {
     return createFiltersFormTemplate(this.#point, this.#destinations, this.#offersList, this.#offersListByType);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
