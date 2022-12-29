@@ -40,38 +40,41 @@ export default class BoardPresenter {
   }
 
   #renderRoutePoint({point, destinations, offersList, offersListByType}) {
-    const routePoint = new RoutePointView({point, destinations, offersList});
-    const formEditingPoint = new FormEditingView({point, destinations, offersList, offersListByType});
-
-    const replacePointToForm = () => {
-      this.#listPointsComponent.element.replaceChild(formEditingPoint.element, routePoint.element);
-    };
-
-    const replaceFormToPoint = () => {
-      this.#listPointsComponent.element.replaceChild(routePoint.element, formEditingPoint.element);
-    };
 
     const escKeyDownHandler = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         evt.preventDefault();
-        replaceFormToPoint();
+        replaceFormToPoint.call(this);
         document.removeEventListener('keydown', escKeyDownHandler);
       }
     };
 
-    routePoint.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
-      replacePointToForm();
-      document.addEventListener('keydown', escKeyDownHandler);
+    const routePoint = new RoutePointView({
+      point,
+      destinations,
+      offersList,
+      onClick: () => {
+        replacePointToForm.call(this);
+        document.addEventListener('keydown', escKeyDownHandler);
+      }});
+
+    const formEditingPoint = new FormEditingView({
+      point,
+      destinations,
+      offersList,
+      offersListByType,
+      onClick: () => {
+        replaceFormToPoint.call(this);
+      }
     });
 
-    formEditingPoint.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
-      replaceFormToPoint();
-    });
+    function replacePointToForm() {
+      this.#listPointsComponent.element.replaceChild(formEditingPoint.element, routePoint.element);
+    }
 
-    formEditingPoint.element.querySelector('.event--edit').addEventListener('submit', (evt) => {
-      evt.preventDefault();
-      replaceFormToPoint();
-    });
+    function replaceFormToPoint() {
+      this.#listPointsComponent.element.replaceChild(routePoint.element, formEditingPoint.element);
+    }
 
     render(routePoint, this.#listPointsComponent.element);
   }
