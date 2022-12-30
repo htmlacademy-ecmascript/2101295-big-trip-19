@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createFiltersFormTemplate() {
   return (
@@ -7,21 +7,8 @@ function createFiltersFormTemplate() {
   );
 }
 
-export default class ListRoutePointsView {
-  #element = null;
+export default class ListRoutePointsView extends AbstractView{
   get template() {
     return createFiltersFormTemplate();
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

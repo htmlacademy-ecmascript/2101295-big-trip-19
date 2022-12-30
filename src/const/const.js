@@ -1,4 +1,4 @@
-export const COUNT_POINTS = 0;
+export const COUNT_POINTS = 4; //на этот коммит оставлю 0 чтобы можно было убедиться что все работает :-)
 
 export const OFFES_BY_TYPE = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 

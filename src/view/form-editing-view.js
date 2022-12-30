@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { humanizeTimeFromTo, humanizeTravelDayForEditing} from '../utils/utils';
 
 function createPhotosTape(srcPhoto) {
@@ -154,33 +154,34 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
   );
 }
 
-export default class FormEditingView {
-  #element = null;
+export default class FormEditingView extends AbstractView {
   #point = null;
   #destinations = null;
   #offersList = null;
   #offersListByType = null;
+  #handleClick = null;
 
-  constructor ({point, destinations, offersList, offersListByType}) {
+  constructor ({point, destinations, offersList, offersListByType, onClick}) {
+    super();
     this.#point = point;
     this.#destinations = destinations;
     this.#offersList = offersList;
     this.#offersListByType = offersListByType;
+    this.#handleClick = onClick;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onEditPointComponentClick);
+    this.element.querySelector('.event--edit').addEventListener('submit', this.#onEditPointComponentSubmit);
   }
 
   get template() {
     return createFiltersFormTemplate(this.#point, this.#destinations, this.#offersList, this.#offersListByType);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  #onEditPointComponentClick = () => {
+    this.#handleClick();
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #onEditPointComponentSubmit = (evt) => {
+    evt.preventDefault();
+    this.#handleClick();
+  };
 }
