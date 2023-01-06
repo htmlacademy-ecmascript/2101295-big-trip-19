@@ -19,3 +19,16 @@ export function humanizeTimeFromTo(dateTo) {
 export function humanizeTravelTime(from, to) {
   return dayjs(to).diff(dayjs(from), 'h');
 }
+
+
+export function isEventPast(dueDate) {
+  return dueDate && dayjs().isAfter(dueDate, 'D');
+}
+
+export function isEventPresent(dateFrom, dateTo) {
+  return (dayjs(dateFrom).isSame(dayjs(), 'D') || dayjs(dateFrom).isBefore(dayjs(), 'D')) && (dayjs(dateTo).isSame(dayjs(), 'D') || dayjs(dateTo).isAfter(dayjs(), 'D'));
+}
+
+export function isEventFuture(dueDate) {
+  return dueDate && dayjs(dueDate).isAfter(dayjs(), 'D');
+}
