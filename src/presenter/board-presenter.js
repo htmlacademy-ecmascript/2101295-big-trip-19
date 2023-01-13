@@ -2,12 +2,13 @@ import FormEditingView from '../view/form-editing-view';
 import ListPointsView from '../view/list-route-points';
 import RoutePointView from '../view/route-point-view';
 import PointsListEmptyView from '../view/points-list-empty-view';
-//import FormCreateView from '../view/form-create-view';
+import FormSortView from '../view/form-sort-view';
 import {render} from '../render.js';
 
 export default class BoardPresenter {
   #listPointsComponent = new ListPointsView();
   #pointsListEmptyView = new PointsListEmptyView();
+  #sortComponent = new FormSortView();
   #boardContainer = null;
   #pointsModel = null;
   #boardOffers = null;
@@ -21,23 +22,22 @@ export default class BoardPresenter {
   }
 
   init() {
-    if (this.#pointsModel.points) {
       this.#boardOffers = [...this.#pointsModel.points];
       this.#destinations = [...this.#pointsModel.destinations];
       this.#offersList = [...this.#pointsModel.offers];
       this.#offersListByType = [...this.#pointsModel.offersByType];
+      this.#renderListPoints();
 
-      render(this.#listPointsComponent, this.#boardContainer);
-      //render(new FormEditingView({point: this.#boardOffers[0], destinations: this.#destinations, offersList: this.#offersList, offersListByType: this.#offersListByType}), this.#listPointsComponent.element);
-      //render(new FormCreateView(), this.#listPointsComponent.element);
-
-      for (let i = 0; i < this.#boardOffers.length; i++) {
-        this.#renderRoutePoint({point: this.#boardOffers[i], destinations: this.#destinations, offersList: this.#offersList, offersListByType: this.#offersListByType});
-      }
-    } else {
-      render(this.#pointsListEmptyView, this.#boardContainer);
-    }
   }
+
+  #renderEventsList() {
+    render(this.#listPointsComponent, this.#boardContainer);
+
+    for (let i = 0; i < this.#boardOffers.length; i++) {
+      this.#renderRoutePoint({point: this.#boardOffers[i], destinations: this.#destinations, offersList: this.#offersList, offersListByType: this.#offersListByType});
+    }
+  };
+
 
   #renderRoutePoint({point, destinations, offersList, offersListByType}) {
 
@@ -77,5 +77,18 @@ export default class BoardPresenter {
     }
 
     render(routePoint, this.#listPointsComponent.element);
+  }
+
+  #renderSort() {
+    render(this.#sortComponent, this.#boardContainer);
+  }
+
+  #renderListPoints() {
+    render(this.#listPointsComponent, this.#boardContainer);
+    if (!this.#pointsModel.points) {
+      render(this.#pointsListEmptyView, this.#boardContainer);
+    }
+    this.#renderSort();
+    this.#renderEventsList();
   }
 }

@@ -14,7 +14,7 @@ const boardPresenter = new BoardPresenter({boardContainer: siteCotentPlace, poin
 
 const filters = generateFilter(pointsModel.points);
 
-render(new FormSortView(), siteCotentPlace);
+
 render(new FiltersFormView({filters}), siteHeaderElement);
 
 boardPresenter.init();
