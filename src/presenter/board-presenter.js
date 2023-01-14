@@ -4,6 +4,7 @@ import RoutePointView from '../view/route-point-view';
 import PointsListEmptyView from '../view/points-list-empty-view';
 import FormSortView from '../view/form-sort-view';
 import {render} from '../render.js';
+import PointPresenter from './point-presenter';
 
 export default class BoardPresenter {
   #listPointsComponent = new ListPointsView();
@@ -41,42 +42,9 @@ export default class BoardPresenter {
 
   #renderRoutePoint({point, destinations, offersList, offersListByType}) {
 
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        replaceFormToPoint.call(this);
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    };
+    const eventPointPresenter = new PointPresenter(this.#listPointsComponent);
 
-    const routePoint = new RoutePointView({
-      point,
-      destinations,
-      offersList,
-      onClick: () => {
-        replacePointToForm.call(this);
-        document.addEventListener('keydown', escKeyDownHandler);
-      }});
-
-    const formEditingPoint = new FormEditingView({
-      point,
-      destinations,
-      offersList,
-      offersListByType,
-      onClick: () => {
-        replaceFormToPoint.call(this);
-      }
-    });
-
-    function replacePointToForm() {
-      this.#listPointsComponent.element.replaceChild(formEditingPoint.element, routePoint.element);
-    }
-
-    function replaceFormToPoint() {
-      this.#listPointsComponent.element.replaceChild(routePoint.element, formEditingPoint.element);
-    }
-
-    render(routePoint, this.#listPointsComponent.element);
+    eventPointPresenter.init(point, destinations, offersList, offersListByType);
   }
 
   #renderSort() {
