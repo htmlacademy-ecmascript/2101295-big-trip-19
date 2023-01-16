@@ -1,5 +1,4 @@
 import FiltersFormView from './view/filters-form-view';
-import FormSortView from './view/form-sort-view';
 import {render} from './render.js';
 import BoardPresenter from './presenter/board-presenter.js';
 import PointsModel from './model/points-model';
@@ -13,7 +12,6 @@ const pointsModel = new PointsModel();
 const boardPresenter = new BoardPresenter({boardContainer: siteCotentPlace, pointsModel});
 
 const filters = generateFilter(pointsModel.points);
-
 
 render(new FiltersFormView({filters}), siteHeaderElement);
 
