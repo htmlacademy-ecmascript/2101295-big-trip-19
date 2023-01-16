@@ -13,7 +13,7 @@ function createOffersTemplate(offer) {
 
 
 function createRoutePointTemplate(point, destinations, offersList) {
-  const {basePrice, dateFrom, dateTo, destination, id, isFavorite, offers, type} = point;
+  const {basePrice, dateFrom, dateTo, destination, isFavorite, offers, type} = point;
   const date = humanizeTravelDay(dateFrom);
 
   const selectedsOffers = offersList.filter((el) => offers.includes(el.id));
@@ -33,7 +33,7 @@ function createRoutePointTemplate(point, destinations, offersList) {
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/sightseeing.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type} ${selectedDestination.name} ${id}</h3>
+      <h3 class="event__title">${type} ${selectedDestination.name}</h3>
       <div class="event__schedule">
         <p class="event__time">
           <time class="event__start-time" datetime="2019-03-19T11:20">${dateStart}</time>
@@ -68,14 +68,18 @@ export default class RoutePointView extends AbstractView {
   #destinations = null;
   #offersList = null;
   #handleClick = null;
+  #handleFavoriteCLick = null;
 
-  constructor({point, destinations, offersList, onClick}) {
+  constructor({point, destinations, offersList, onClick, onFavoriteClick}) {
     super();
     this.#point = point;
     this.#destinations = destinations;
     this.#offersList = offersList;
     this.#handleClick = onClick;
+    this.#handleFavoriteCLick = onFavoriteClick;
+
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#clickHandler);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteButtonCLickHandler);
   }
 
   get template() {
@@ -85,5 +89,10 @@ export default class RoutePointView extends AbstractView {
   #clickHandler = (evt) => {
     evt.preventDefault();
     this.#handleClick();
+  };
+
+  #favoriteButtonCLickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteCLick();
   };
 }

@@ -1,19 +1,21 @@
-import FormEditingView from '../view/form-editing-view';
 import ListPointsView from '../view/list-route-points';
-import RoutePointView from '../view/route-point-view';
 import PointsListEmptyView from '../view/points-list-empty-view';
-//import FormCreateView from '../view/form-create-view';
+import FormSortView from '../view/form-sort-view';
 import {render} from '../render.js';
+import PointPresenter from './point-presenter';
+import {updateItem} from '../utils/common.js';
 
 export default class BoardPresenter {
   #listPointsComponent = new ListPointsView();
   #pointsListEmptyView = new PointsListEmptyView();
+  #sortComponent = new FormSortView();
   #boardContainer = null;
   #pointsModel = null;
   #boardOffers = null;
   #destinations = null;
   #offersList = null;
   #offersListByType = null;
+  #pointsPresenter = new Map();
 
   constructor({boardContainer, pointsModel}) {
     this.#boardContainer = boardContainer;
@@ -21,61 +23,52 @@ export default class BoardPresenter {
   }
 
   init() {
-    if (this.#pointsModel.points) {
-      this.#boardOffers = [...this.#pointsModel.points];
-      this.#destinations = [...this.#pointsModel.destinations];
-      this.#offersList = [...this.#pointsModel.offers];
-      this.#offersListByType = [...this.#pointsModel.offersByType];
+    this.#boardOffers = [...this.#pointsModel.points];
+    this.#destinations = [...this.#pointsModel.destinations];
+    this.#offersList = [...this.#pointsModel.offers];
+    this.#offersListByType = [...this.#pointsModel.offersByType];
+    this.#renderListPoints();
 
-      render(this.#listPointsComponent, this.#boardContainer);
-      //render(new FormEditingView({point: this.#boardOffers[0], destinations: this.#destinations, offersList: this.#offersList, offersListByType: this.#offersListByType}), this.#listPointsComponent.element);
-      //render(new FormCreateView(), this.#listPointsComponent.element);
+  }
 
-      for (let i = 0; i < this.#boardOffers.length; i++) {
-        this.#renderRoutePoint({point: this.#boardOffers[i], destinations: this.#destinations, offersList: this.#offersList, offersListByType: this.#offersListByType});
-      }
-    } else {
-      render(this.#pointsListEmptyView, this.#boardContainer);
+  #handleModeChange = () => {
+    this.#pointsPresenter.forEach((presenter) => presenter.resetView());
+  };
+
+  #renderEventsList() {
+    render(this.#listPointsComponent, this.#boardContainer);
+
+    for (let i = 0; i < this.#boardOffers.length; i++) {
+      this.#renderRoutePoint({point: this.#boardOffers[i], destinations: this.#destinations, offersList: this.#offersList, offersListByType: this.#offersListByType});
     }
   }
 
+  #clearTaskList() {
+    this.#pointsPresenter.forEach((presenter) => presenter.destroy());
+    this.#pointsPresenter.clear();
+  }
+
   #renderRoutePoint({point, destinations, offersList, offersListByType}) {
+    const eventPointPresenter = new PointPresenter({listContainer: this.#listPointsComponent.element, onDataChange: this.#handleTaskChange, onModeChange: this.#handleModeChange});
+    eventPointPresenter.init(point, destinations, offersList, offersListByType);
+    this.#pointsPresenter.set(point.id, eventPointPresenter);
+  }
 
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        replaceFormToPoint.call(this);
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    };
+  #handleTaskChange = (updatedPoint) => {
+    this.#boardOffers = updateItem(this.#boardOffers, updatedPoint);
+    this.#pointsPresenter.get(updatedPoint.id).init(updatedPoint, this.#destinations, this.#offersList, this.#offersListByType);
+  };
 
-    const routePoint = new RoutePointView({
-      point,
-      destinations,
-      offersList,
-      onClick: () => {
-        replacePointToForm.call(this);
-        document.addEventListener('keydown', escKeyDownHandler);
-      }});
+  #renderSort() {
+    render(this.#sortComponent, this.#boardContainer);
+  }
 
-    const formEditingPoint = new FormEditingView({
-      point,
-      destinations,
-      offersList,
-      offersListByType,
-      onClick: () => {
-        replaceFormToPoint.call(this);
-      }
-    });
-
-    function replacePointToForm() {
-      this.#listPointsComponent.element.replaceChild(formEditingPoint.element, routePoint.element);
+  #renderListPoints() {
+    render(this.#listPointsComponent, this.#boardContainer);
+    if (!this.#pointsModel.points) {
+      render(this.#pointsListEmptyView, this.#boardContainer);
     }
-
-    function replaceFormToPoint() {
-      this.#listPointsComponent.element.replaceChild(routePoint.element, formEditingPoint.element);
-    }
-
-    render(routePoint, this.#listPointsComponent.element);
+    this.#renderSort();
+    this.#renderEventsList();
   }
 }
