@@ -4,22 +4,29 @@ import FormEditingView from '../view/form-editing-view';
 //import {render} from '../render.js';
 import {render, replace, remove} from '../framework/render.js';
 
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
 export default class PointPresenter {
   #listPointsComponent = null;
+  #handleModeChange = null;
+  #handleDataChange = null;
 
   #routePointComponent = null;
   #formEditingComponent = null;
-
-  #handleDataChange = null;
 
   #point = null;
   #destinations = null;
   #offersList = null;
   #offersListByType = null;
 
-  constructor({listContainer, onDataChange}) {
+  #mode = Mode.DEFAULT;
+
+  constructor({listContainer, onDataChange, onModeChange}) {
     this.#listPointsComponent = listContainer;
     this.#handleDataChange = onDataChange;
+    this.#handleModeChange = onModeChange;
   }
 
   init(point, destinations, offersList, offersListByType) {
@@ -52,16 +59,22 @@ export default class PointPresenter {
       return;
     }
 
-    if (this.#listPointsComponent.contains(prevPointComponent.element)) {
+    if (this.#mode === Mode.DEFAULT) {
       replace(this.#routePointComponent, prevPointComponent);
     }
 
-    if (this.#listPointsComponent.contains(prevPointEditComponent.element)) {
+    if (this.#mode === Mode.EDITING) {
       replace(this.#formEditingComponent, prevPointEditComponent);
     }
 
     remove(prevPointComponent);
     remove(prevPointEditComponent);
+  }
+
+  resetView() {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#replaceFormToPoint();
+    }
   }
 
   destroy() {
@@ -79,11 +92,14 @@ export default class PointPresenter {
   #replacePointToForm () {
     replace(this.#formEditingComponent, this.#routePointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#handleModeChange();
+    this.#mode = Mode.EDITING;
   }
 
   #replaceFormToPoint () {
     replace(this.#routePointComponent, this.#formEditingComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#mode = Mode.DEFAULT;
   }
 
   #handleFavoriteClick = () => {
