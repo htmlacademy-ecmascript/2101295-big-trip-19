@@ -67,6 +67,9 @@ export default class BoardPresenter {
 
   #sortWaypoints = (sortType)=>{
     switch (sortType) {
+      case SortType.DAY:
+        this.#boardOffers.sort(sortByDay);
+        break;
       case SortType.TIME:
         this.#boardOffers.sort(sortByTime);
         break;
@@ -74,8 +77,7 @@ export default class BoardPresenter {
         this.#boardOffers.sort(sortByPrice);
         break;
       default:
-        this.#boardOffers.sort(sortByDay);
-        break;
+        this.#boardOffers = [...this.#originalEventPoints];
     }
     this.#currentSortType = sortType;
   };
