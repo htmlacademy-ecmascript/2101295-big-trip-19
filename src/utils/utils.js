@@ -32,3 +32,16 @@ export function isEventPresent(dateFrom, dateTo) {
 export function isEventFuture(dueDate) {
   return dueDate && dayjs(dueDate).isAfter(dayjs(), 'D');
 }
+
+export const sortByTime = (waypointA, waypointB)=>{
+  const durationA = dayjs(waypointA.dateTo).diff(dayjs(waypointA.dateFrom));
+  const durationB = dayjs(waypointB.dateTo).diff(dayjs(waypointB.dateFrom));
+
+  return durationB - durationA;
+};
+
+export const sortByPrice = (waypointA, waypointB)=> waypointB.basePrice - waypointA.basePrice;
+
+
+export const sortByDay = (waypointA, waypointB)=>dayjs(waypointA.dateFrom).diff(dayjs(waypointB.dateFrom));
+

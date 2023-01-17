@@ -1,7 +1,5 @@
-
 import RoutePointView from '../view/route-point-view';
 import FormEditingView from '../view/form-editing-view';
-//import {render} from '../render.js';
 import {render, replace, remove} from '../framework/render.js';
 
 const Mode = {

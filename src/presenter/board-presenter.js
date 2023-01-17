@@ -4,11 +4,14 @@ import FormSortView from '../view/form-sort-view';
 import {render} from '../render.js';
 import PointPresenter from './point-presenter';
 import {updateItem} from '../utils/common.js';
+import {SortType} from '../const/const';
+import {sortByTime, sortByPrice, sortByDay} from '../utils/utils';
+
 
 export default class BoardPresenter {
   #listPointsComponent = new ListPointsView();
   #pointsListEmptyView = new PointsListEmptyView();
-  #sortComponent = new FormSortView();
+  #sortComponent = null;
   #boardContainer = null;
   #pointsModel = null;
   #boardOffers = null;
@@ -16,6 +19,8 @@ export default class BoardPresenter {
   #offersList = null;
   #offersListByType = null;
   #pointsPresenter = new Map();
+  #currentSortType = SortType.DAY;
+  #originalEventPoints = [];
 
   constructor({boardContainer, pointsModel}) {
     this.#boardContainer = boardContainer;
@@ -24,6 +29,7 @@ export default class BoardPresenter {
 
   init() {
     this.#boardOffers = [...this.#pointsModel.points];
+    this.#originalEventPoints = [...this.#pointsModel.points];
     this.#destinations = [...this.#pointsModel.destinations];
     this.#offersList = [...this.#pointsModel.offers];
     this.#offersListByType = [...this.#pointsModel.offersByType];
@@ -49,17 +55,46 @@ export default class BoardPresenter {
   }
 
   #renderRoutePoint({point, destinations, offersList, offersListByType}) {
-    const eventPointPresenter = new PointPresenter({listContainer: this.#listPointsComponent.element, onDataChange: this.#handleTaskChange, onModeChange: this.#handleModeChange});
+    const eventPointPresenter = new PointPresenter({listContainer: this.#listPointsComponent.element, onDataChange: this.#handlePointChange, onModeChange: this.#handleModeChange});
     eventPointPresenter.init(point, destinations, offersList, offersListByType);
     this.#pointsPresenter.set(point.id, eventPointPresenter);
   }
 
-  #handleTaskChange = (updatedPoint) => {
+  #handlePointChange = (updatedPoint) => {
     this.#boardOffers = updateItem(this.#boardOffers, updatedPoint);
     this.#pointsPresenter.get(updatedPoint.id).init(updatedPoint, this.#destinations, this.#offersList, this.#offersListByType);
   };
 
+  #sortWaypoints = (sortType)=>{
+    switch (sortType) {
+      case SortType.DAY:
+        this.#boardOffers.sort(sortByDay);
+        break;
+      case SortType.TIME:
+        this.#boardOffers.sort(sortByTime);
+        break;
+      case SortType.PRICE:
+        this.#boardOffers.sort(sortByPrice);
+        break;
+      default:
+        this.#boardOffers = [...this.#originalEventPoints];
+    }
+    this.#currentSortType = sortType;
+  };
+
+  #handleSortTypeChange = (sortType)=>{
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+    this.#sortWaypoints(sortType);
+    this.#clearTaskList();
+    this.#renderEventsList();
+  };
+
   #renderSort() {
+    this.#sortComponent = new FormSortView({
+      onSortTypeChange: this.#handleSortTypeChange
+    });
     render(this.#sortComponent, this.#boardContainer);
   }
 
@@ -69,6 +104,7 @@ export default class BoardPresenter {
       render(this.#pointsListEmptyView, this.#boardContainer);
     }
     this.#renderSort();
+    this.#sortWaypoints(this.#currentSortType);
     this.#renderEventsList();
   }
 }
