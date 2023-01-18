@@ -1,5 +1,10 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework//view/abstract-stateful-view';
 import { humanizeTimeFromTo, humanizeTravelDayForEditing} from '../utils/utils';
+import {DESTINATION} from '../mock/mocks-const';
+
+function createDestinationListTemplate() {
+  return DESTINATION.map((city) => `<option value="${city.name}"></option>`).join('');
+}
 
 function createPhotosTape(srcPhoto) {
   return (
@@ -103,9 +108,7 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${selectedDestination.name}" list="destination-list-1">
           <datalist id="destination-list-1">
-            <option value="Amsterdam"></option>
-            <option value="Geneva"></option>
-            <option value="Chamonix"></option>
+            ${createDestinationListTemplate()}
           </datalist>
         </div>
 
@@ -154,26 +157,49 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
   );
 }
 
-export default class FormEditingView extends AbstractView {
-  #point = null;
+export default class FormEditingView extends AbstractStatefulView {
+  //#point = null;
   #destinations = null;
   #offersList = null;
   #offersListByType = null;
   #handleClick = null;
+  #handleEditorFormSubmit = null;
 
-  constructor ({point, destinations, offersList, offersListByType, onClick}) {
+  constructor ({point, destinations, offersList, offersListByType, onClick, onFormSubmit}) {
     super();
-    this.#point = point;
+    //this.#point = point;
+    this._setState(FormEditingView.parsePointToState(point));
     this.#destinations = destinations;
     this.#offersList = offersList;
     this.#offersListByType = offersListByType;
     this.#handleClick = onClick;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onEditPointComponentClick);
-    this.element.querySelector('.event--edit').addEventListener('submit', this.#onEditPointComponentSubmit);
+    this.#handleEditorFormSubmit = onFormSubmit;
+    this._restoreHandlers();
   }
 
   get template() {
-    return createFiltersFormTemplate(this.#point, this.#destinations, this.#offersList, this.#offersListByType);
+    return createFiltersFormTemplate(this._state, this.#destinations, this.#offersList, this.#offersListByType);
+  }
+
+  reset(point) {
+    this.updateElement(FormEditingView.parsePointToState(point));
+  }
+
+  _restoreHandlers() {
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onEditPointComponentClick);
+    this.element.querySelector('.event--edit').addEventListener('submit', this.#onEditPointComponentSubmit);
+    this.element.querySelector('.event__type-list').addEventListener('change', this.#pointTypeChangeHandler);
+    this.element.querySelector('.event__input--price').addEventListener('input', this.#pointPriceInputHandler);
+  }
+
+  static parsePointToState(point) {
+    return {...point
+    };
+  }
+
+  static parseStateToPoint(state){
+    const point = {...state};
+    return point;
   }
 
   #onEditPointComponentClick = () => {
@@ -182,6 +208,24 @@ export default class FormEditingView extends AbstractView {
 
   #onEditPointComponentSubmit = (evt) => {
     evt.preventDefault();
-    this.#handleClick();
+    this.#handleEditorFormSubmit(FormEditingView.parseStateToPoint(this._state));
   };
+
+  #pointTypeChangeHandler = (evt) => {
+    const inputElement = evt.target.closest('.event__type-item').querySelector('.event__type-input');
+    if (inputElement) {
+      evt.preventDefault();
+      this.updateElement({
+        type: inputElement.value
+      });
+    }
+  };
+
+  #pointPriceInputHandler = (evt) => {
+    evt.preventDefault();
+    this._setState({
+      basePrice: evt.target.value
+    });
+  };
+
 }

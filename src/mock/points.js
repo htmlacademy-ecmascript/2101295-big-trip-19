@@ -1,4 +1,3 @@
-import {nanoid} from 'nanoid';
 import { OFFES_BY_TYPE} from '../const/const';
 import { offersListByType} from './offer';
 import {getRandomArrayElement, getRandomNumber} from './utils-mock';
@@ -25,7 +24,7 @@ export const getPoint = (lengthOfArray) => {
       dateFrom: '2019-07-10T22:55:56.845Z',
       dateTo: '2019-07-11T11:22:13.375Z',
       destination: getRandomNumber(0, 3),
-      id: nanoid(),
+      id: `${arrayPoints.length}`,
       isFavorite: true,
       offers: selectidOffers,
       type: typeOfOffers
