@@ -1,6 +1,9 @@
 import AbstractStatefulView from '../framework//view/abstract-stateful-view';
 import { humanizeTimeFromTo, humanizeTravelDayForEditing} from '../utils/utils';
 import {DESTINATION} from '../mock/mocks-const';
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
 
 function createDestinationListTemplate() {
   return DESTINATION.map((city) => `<option value="${city.name}"></option>`).join('');
@@ -163,6 +166,8 @@ export default class FormEditingView extends AbstractStatefulView {
   #offersListByType = null;
   #handleClick = null;
   #handleEditorFormSubmit = null;
+  #startDatePicker = null;
+  #endDatePicker = null;
 
   constructor ({point, destinations, offersList, offersListByType, onClick, onFormSubmit}) {
     super();
@@ -174,6 +179,24 @@ export default class FormEditingView extends AbstractStatefulView {
     this.#handleEditorFormSubmit = onFormSubmit;
     this._restoreHandlers();
   }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this.#startDatePicker || this.#endDatePicker) {
+      this.#startDatePicker.destroy();
+      this.#endDatePicker.destroy();
+
+      this.#startDatePicker = null;
+      this.#endDatePicker = null;
+    }
+  }
+
+  #dueDateChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dueDate: userDate,
+    });
+  };
 
   get template() {
     return createFiltersFormTemplate(this._state, this.#destinations, this.#offersList, this.#offersListByType);
@@ -189,6 +212,8 @@ export default class FormEditingView extends AbstractStatefulView {
     this.element.querySelector('.event__type-list').addEventListener('change', this.#pointTypeChangeHandler);
     this.element.querySelector('.event__input--price').addEventListener('input', this.#pointPriceInputHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#eventChangeDestinationHandler);
+
+    this.#setDatePickers();
   }
 
   static parsePointToState(point) {
@@ -232,4 +257,39 @@ export default class FormEditingView extends AbstractStatefulView {
     const newDestination = this.#destinations.find((destination) => destination.name === value);
     this.updateElement({destination: newDestination.id});
   };
+
+  #pointStartDateChangeHandler = ([startDate]) => {
+    this._setState({
+      dateFrom: startDate,
+    });
+  };
+
+  #pointEndDateChangeHandler = ([endDate]) => {
+    this._setState({
+      dateTo: endDate,
+    });
+  };
+
+  #setDatePickers() {
+    const startTimeElement = this.element.querySelector('#event-start-time-1');
+    const endTimeElement = this.element.querySelector('#event-end-time-1');
+
+    this.#startDatePicker = flatpickr(startTimeElement,
+      {
+        enableTime: true,
+        defaultDate: this._state.dateFrom,
+        dateFormat: 'd/m/y H:i',
+        onChange: this.#pointStartDateChangeHandler,
+      }
+    );
+
+    this.#endDatePicker = flatpickr(endTimeElement,
+      {
+        enableTime: true,
+        defaultDate: this._state.dateTo,
+        dateFormat: 'd/m/y H:i',
+        onChange: this.#pointEndDateChangeHandler,
+      }
+    );
+  }
 }
