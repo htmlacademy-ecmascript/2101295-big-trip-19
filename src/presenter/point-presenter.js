@@ -50,6 +50,7 @@ export default class PointPresenter {
       offersList: this.#offersList,
       offersListByType: this.#offersListByType,
       onClick: this.#handleClosePointBoardButtonClick,
+      onFormSubmit: this.#handleEditorFormSubmit,
     });
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
@@ -71,6 +72,7 @@ export default class PointPresenter {
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#formEditingComponent.reset(this.#point);
       this.#replaceFormToPoint();
     }
   }
@@ -106,4 +108,9 @@ export default class PointPresenter {
 
   #handleOpenPointBoardButtonClick = () => this.#replacePointToForm();
   #handleClosePointBoardButtonClick = () => this.#replaceFormToPoint();
+
+  #handleEditorFormSubmit = (point) => {
+    this.#handleDataChange(point);
+    this.#replaceFormToPoint();
+  };
 }

@@ -15,10 +15,8 @@ function createOffersTemplate(offer) {
 function createRoutePointTemplate(point, destinations, offersList) {
   const {basePrice, dateFrom, dateTo, destination, isFavorite, offers, type} = point;
   const date = humanizeTravelDay(dateFrom);
-
   const selectedsOffers = offersList.filter((el) => offers.includes(el.id));
   const selectedDestination = destinations.find((el) => el.id === destination);
-
   const dateStart = humanizeTimeFromTo(dateFrom);
   const dateFinish = humanizeTimeFromTo(dateTo);
 
