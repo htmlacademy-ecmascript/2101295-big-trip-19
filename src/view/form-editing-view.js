@@ -158,7 +158,6 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
 }
 
 export default class FormEditingView extends AbstractStatefulView {
-  //#point = null;
   #destinations = null;
   #offersList = null;
   #offersListByType = null;
@@ -167,7 +166,6 @@ export default class FormEditingView extends AbstractStatefulView {
 
   constructor ({point, destinations, offersList, offersListByType, onClick, onFormSubmit}) {
     super();
-    //this.#point = point;
     this._setState(FormEditingView.parsePointToState(point));
     this.#destinations = destinations;
     this.#offersList = offersList;
@@ -190,6 +188,7 @@ export default class FormEditingView extends AbstractStatefulView {
     this.element.querySelector('.event--edit').addEventListener('submit', this.#onEditPointComponentSubmit);
     this.element.querySelector('.event__type-list').addEventListener('change', this.#pointTypeChangeHandler);
     this.element.querySelector('.event__input--price').addEventListener('input', this.#pointPriceInputHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#eventChangeDestinationHandler);
   }
 
   static parsePointToState(point) {
@@ -228,4 +227,9 @@ export default class FormEditingView extends AbstractStatefulView {
     });
   };
 
+  #eventChangeDestinationHandler = (evt) => {
+    const {value} = evt.target;
+    const newDestination = this.#destinations.find((destination) => destination.name === value);
+    this.updateElement({destination: newDestination.id});
+  };
 }
