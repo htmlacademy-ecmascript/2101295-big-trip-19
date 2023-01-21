@@ -27,6 +27,18 @@ export default class BoardPresenter {
     this.#pointsModel = pointsModel;
   }
 
+  get points() {
+    switch (this.#currentSortType) {
+      case SortType.DAY:
+        return this.#boardOffers.sort(sortByDay);
+      case SortType.TIME:
+        return this.#boardOffers.sort(sortByTime);
+      case SortType.PRICE:
+        return this.#boardOffers.sort(sortByPrice);
+    }
+    return this.#pointsModel.points;
+  }
+
   init() {
     this.#boardOffers = [...this.#pointsModel.points];
     this.#originalEventPoints = [...this.#pointsModel.points];
@@ -34,19 +46,17 @@ export default class BoardPresenter {
     this.#offersList = [...this.#pointsModel.offers];
     this.#offersListByType = [...this.#pointsModel.offersByType];
     this.#renderListPoints();
-
   }
+
 
   #handleModeChange = () => {
     this.#pointsPresenter.forEach((presenter) => presenter.resetView());
   };
 
-  #renderEventsList() {
+  #renderEventsList(points) {
     render(this.#listPointsComponent, this.#boardContainer);
 
-    for (let i = 0; i < this.#boardOffers.length; i++) {
-      this.#renderRoutePoint({point: this.#boardOffers[i], destinations: this.#destinations, offersList: this.#offersList, offersListByType: this.#offersListByType});
-    }
+    points.forEach((point) => this.#renderRoutePoint({point, destinations: this.#destinations, offersList: this.#offersList, offersListByType: this.#offersListByType}));
   }
 
   #clearTaskList() {
@@ -65,30 +75,13 @@ export default class BoardPresenter {
     this.#pointsPresenter.get(updatedPoint.id).init(updatedPoint, this.#destinations, this.#offersList, this.#offersListByType);
   };
 
-  #sortWaypoints = (sortType)=>{
-    switch (sortType) {
-      case SortType.DAY:
-        this.#boardOffers.sort(sortByDay);
-        break;
-      case SortType.TIME:
-        this.#boardOffers.sort(sortByTime);
-        break;
-      case SortType.PRICE:
-        this.#boardOffers.sort(sortByPrice);
-        break;
-      default:
-        this.#boardOffers = [...this.#originalEventPoints];
-    }
-    this.#currentSortType = sortType;
-  };
-
   #handleSortTypeChange = (sortType)=>{
     if (this.#currentSortType === sortType) {
       return;
     }
-    this.#sortWaypoints(sortType);
+    this.#currentSortType = sortType;
     this.#clearTaskList();
-    this.#renderEventsList();
+    this.#renderEventsList(this.points);
   };
 
   #renderSort() {
@@ -104,7 +97,7 @@ export default class BoardPresenter {
       render(this.#pointsListEmptyView, this.#boardContainer);
     }
     this.#renderSort();
-    this.#sortWaypoints(this.#currentSortType);
-    this.#renderEventsList();
+    //this.#sortWaypoints(this.#currentSortType);
+    this.#renderEventsList(this.points);
   }
 }
