@@ -1,6 +1,7 @@
 import RoutePointView from '../view/route-point-view';
 import FormEditingView from '../view/form-editing-view';
 import {render, replace, remove} from '../framework/render.js';
+import {UserAction, UpdateType} from '../const/const';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -51,6 +52,7 @@ export default class PointPresenter {
       offersListByType: this.#offersListByType,
       onClick: this.#handleClosePointBoardButtonClick,
       onFormSubmit: this.#handleEditorFormSubmit,
+      onDeleteClick: this.#handleDeleteClick
     });
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
@@ -103,14 +105,31 @@ export default class PointPresenter {
   }
 
   #handleFavoriteClick = () => {
-    this.#handleDataChange({...this.#point, isFavorite: !this.#point.isFavorite});
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.PATCH,
+      {...this.#point, isFavorite: !this.#point.isFavorite},
+    );
+    //this.#handleDataChange({...this.#point, isFavorite: !this.#point.isFavorite});
+  };
+
+  #handleDeleteClick = (point) => {
+    this.#handleDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
+  };
+
+  #handleEditorFormSubmit = (point) => {
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.PATCH,
+      point
+    );
+    this.#replaceFormToPoint();
   };
 
   #handleOpenPointBoardButtonClick = () => this.#replacePointToForm();
   #handleClosePointBoardButtonClick = () => this.#replaceFormToPoint();
-
-  #handleEditorFormSubmit = (point) => {
-    this.#handleDataChange(point);
-    this.#replaceFormToPoint();
-  };
 }
