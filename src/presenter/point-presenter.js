@@ -2,6 +2,7 @@ import RoutePointView from '../view/route-point-view';
 import FormEditingView from '../view/form-editing-view';
 import {render, replace, remove} from '../framework/render.js';
 import {UserAction, UpdateType} from '../const/const';
+import {isDatesEqual} from '../utils/utils';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -110,7 +111,6 @@ export default class PointPresenter {
       UpdateType.PATCH,
       {...this.#point, isFavorite: !this.#point.isFavorite},
     );
-    //this.#handleDataChange({...this.#point, isFavorite: !this.#point.isFavorite});
   };
 
   #handleDeleteClick = (point) => {
@@ -122,12 +122,15 @@ export default class PointPresenter {
   };
 
   #handleEditorFormSubmit = (point) => {
+    const isMinorUpdate = !(isDatesEqual(this.#point.dateFrom, point.dateFrom)
+    && isDatesEqual(this.#point.dateTo, point.dateTo))
+    || (this.#point.basePrice !== point.basePrice);
+
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
-      UpdateType.PATCH,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       point
     );
-    this.#replaceFormToPoint();
   };
 
   #handleOpenPointBoardButtonClick = () => this.#replacePointToForm();
