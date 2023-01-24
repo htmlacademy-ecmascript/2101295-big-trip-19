@@ -3,8 +3,8 @@ import PointsListEmptyView from '../view/points-list-empty-view';
 import FormSortView from '../view/form-sort-view';
 import {render, remove} from '../framework/render.js';
 import PointPresenter from './point-presenter';
+import NewPointPresenter from './new-point-presenter';
 import { filter } from '../utils/filters';
-//import {updateItem} from '../utils/common.js';
 import {SortType, UserAction, UpdateType, FilterType} from '../const/const';
 import {sortByTime, sortByPrice, sortByDay} from '../utils/utils';
 
@@ -20,14 +20,21 @@ export default class BoardPresenter {
   #offersList = null;
   #offersListByType = null;
   #pointsPresenter = new Map();
+  #newPointPresenter = null;
   #currentSortType = SortType.DAY;
   #filtersModel = null;
   #boardOffers = null;
 
-  constructor({boardContainer, pointsModel, filtersModel}) {
+  constructor({boardContainer, pointsModel, filtersModel, onNewPointDestroy}) {
     this.#boardContainer = boardContainer;
     this.#pointsModel = pointsModel;
     this.#filtersModel = filtersModel;
+
+    this.#newPointPresenter = new NewPointPresenter({
+      pointListContainer: this.#listPointsComponent.element,
+      onDataChange: this.#handleViewAction,
+      onDestroy: onNewPointDestroy,
+    });
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filtersModel.addObserver(this.#handleModelEvent);
@@ -59,13 +66,17 @@ export default class BoardPresenter {
 
   init() {
     this.#boardOffers = [...this.#pointsModel.points];
-    //this.#originalEventPoints = [...this.#pointsModel.points];
     this.#destinations = [...this.#pointsModel.destinations];
     this.#offersList = [...this.#pointsModel.offers];
     this.#offersListByType = [...this.#pointsModel.offersByType];
     this.#renderPointsList();
   }
 
+  createPoints() {
+    this.#currentSortType = SortType.DAY;
+    this.#filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#newPointPresenter.init(this.#destinations, this.#offersList, this.#offersListByType);
+  }
 
   #handleModeChange = () => {
     this.#pointsPresenter.forEach((presenter) => presenter.resetView());
@@ -77,7 +88,6 @@ export default class BoardPresenter {
   }
 
   #handleViewAction = (actionType, updateType, update) => {
-    //console.log(actionType, updateType, update);
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this.#pointsModel.updatePoint(updateType, update);
@@ -126,11 +136,6 @@ export default class BoardPresenter {
     eventPointPresenter.init(point, destinations, offersList, offersListByType);
     this.#pointsPresenter.set(point.id, eventPointPresenter);
   }
-
-  // #handlePointChange = (updatedPoint) => {
-  //   this.#boardOffers = updateItem(this.#boardOffers, updatedPoint);
-  //   this.#pointsPresenter.get(updatedPoint.id).init(updatedPoint, this.#destinations, this.#offersList, this.#offersListByType);
-  // };
 
   #handleSortTypeChange = (sortType)=>{
     if (this.#currentSortType === sortType) {

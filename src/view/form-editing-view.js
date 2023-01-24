@@ -5,6 +5,17 @@ import flatpickr from 'flatpickr';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
+const DEFAULT_POINT = {
+  basePrice: '0',
+  dateFrom: '2019-07-10T22:55:56.845Z',
+  dateTo: '2019-07-11T11:22:13.375Z',
+  destination: 0,
+  id: '123',
+  isFavorite: false,
+  offers: [],
+  type: 'taxi'
+};
+
 function createDestinationListTemplate() {
   return DESTINATION.map((city) => `<option value="${city.name}"></option>`).join('');
 }
@@ -31,7 +42,6 @@ function createAvailableOffers(offer, selectedsOffers) {
 
 function createFiltersFormTemplate(point, destinations, offersList, offersListByType) {
   const {basePrice, dateFrom, dateTo, destination, offers, type} = point;
-
   const dateStart = humanizeTravelDayForEditing(dateFrom);
   const dateFinish = humanizeTravelDayForEditing(dateTo);
 
@@ -170,7 +180,7 @@ export default class FormEditingView extends AbstractStatefulView {
   #endDatePicker = null;
   #handleDeleteClick = null;
 
-  constructor ({point, destinations, offersList, offersListByType, onClick, onFormSubmit, onDeleteClick}) {
+  constructor ({point = DEFAULT_POINT, destinations, offersList, offersListByType, onClick, onFormSubmit, onDeleteClick}) {
     super();
     this._setState(FormEditingView.parsePointToState(point));
     this.#destinations = destinations;

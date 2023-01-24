@@ -30,7 +30,6 @@ export default class FiltersFormView extends AbstractView {
     this.#currentFilter = currentFilterType;
     this.#handleFilterTypeChange = onFilterTypeChange;
 
-    // this.element.addEventListener('click', this.#filterTypeChangeHandler);
     this.element.addEventListener('change', this.#filterTypeChangeHandler);
   }
 
