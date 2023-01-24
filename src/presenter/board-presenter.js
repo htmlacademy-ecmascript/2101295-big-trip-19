@@ -1,7 +1,7 @@
 import ListPointsView from '../view/list-route-points';
 import PointsListEmptyView from '../view/points-list-empty-view';
 import FormSortView from '../view/form-sort-view';
-import {render, remove} from '../framework/render.js';
+import {render, remove, RenderPosition} from '../framework/render.js';
 import PointPresenter from './point-presenter';
 import NewPointPresenter from './new-point-presenter';
 import { filter } from '../utils/filters';
@@ -61,7 +61,7 @@ export default class BoardPresenter {
       filterType: this.#filterType
     });
 
-    render(this.#pointsListEmptyView, this.#boardContainer);
+    render(this.#pointsListEmptyView, this.#boardContainer, RenderPosition.AFTEREND);
   }
 
   init() {
@@ -127,7 +127,7 @@ export default class BoardPresenter {
     }
 
     if (resetSortType) {
-      this.#currentSortType = SortType.DEFAULT;
+      this.#currentSortType = SortType.DAY;
     }
   }
 
