@@ -2,7 +2,7 @@ import AbstractStatefulView from '../framework//view/abstract-stateful-view';
 import { humanizeTimeFromTo, humanizeTravelDayForEditing} from '../utils/utils';
 import {DESTINATION} from '../mock/mocks-const';
 import flatpickr from 'flatpickr';
-
+import {CITIES} from '../mock/mocks-const';
 import 'flatpickr/dist/flatpickr.min.css';
 
 const DEFAULT_POINT = {
@@ -119,7 +119,7 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${selectedDestination.name}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${selectedDestination.name}" list="destination-list-1" required>
           <datalist id="destination-list-1">
             ${createDestinationListTemplate()}
           </datalist>
@@ -138,7 +138,7 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}" required>
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -204,12 +204,6 @@ export default class FormEditingView extends AbstractStatefulView {
     }
   }
 
-  #dueDateChangeHandler = ([userDate]) => {
-    this.updateElement({
-      dueDate: userDate,
-    });
-  };
-
   get template() {
     return createFiltersFormTemplate(this._state, this.#destinations, this.#offersList, this.#offersListByType);
   }
@@ -259,6 +253,7 @@ export default class FormEditingView extends AbstractStatefulView {
   };
 
   #pointPriceInputHandler = (evt) => {
+    this.element.querySelector('.event__save-btn').disabled = true;
     evt.preventDefault();
     this._setState({
       basePrice: evt.target.value
@@ -266,9 +261,12 @@ export default class FormEditingView extends AbstractStatefulView {
   };
 
   #eventChangeDestinationHandler = (evt) => {
-    const {value} = evt.target;
-    const newDestination = this.#destinations.find((destination) => destination.name === value);
-    this.updateElement({destination: newDestination.id});
+    if (CITIES.includes(evt.target.value)) {
+      this.updateElement({
+        destination: CITIES.indexOf(evt.target.value)
+      });
+    } else {evt.target.value = ''; evt.target.placeholder = 'выберите из списка';}
+
   };
 
   #pointStartDateChangeHandler = ([startDate]) => {

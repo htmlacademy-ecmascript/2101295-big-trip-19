@@ -131,8 +131,12 @@ export default class PointPresenter {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       point
     );
+    this.#replaceFormToPoint();
   };
 
   #handleOpenPointBoardButtonClick = () => this.#replacePointToForm();
-  #handleClosePointBoardButtonClick = () => this.#replaceFormToPoint();
+  #handleClosePointBoardButtonClick = () => {
+    this.#formEditingComponent.reset(this.#point);
+    this.#replaceFormToPoint();
+  };
 }
