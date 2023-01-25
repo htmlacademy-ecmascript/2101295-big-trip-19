@@ -45,3 +45,5 @@ export const sortByPrice = (waypointA, waypointB)=> waypointB.basePrice - waypoi
 
 export const sortByDay = (waypointA, waypointB)=>dayjs(waypointA.dateFrom).diff(dayjs(waypointB.dateFrom));
 
+export const isDatesEqual = (dateA, dateB) => (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'm');
+

@@ -1,6 +1,8 @@
 import RoutePointView from '../view/route-point-view';
 import FormEditingView from '../view/form-editing-view';
 import {render, replace, remove} from '../framework/render.js';
+import {UserAction, UpdateType} from '../const/const';
+import {isDatesEqual} from '../utils/utils';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -51,6 +53,7 @@ export default class PointPresenter {
       offersListByType: this.#offersListByType,
       onClick: this.#handleClosePointBoardButtonClick,
       onFormSubmit: this.#handleEditorFormSubmit,
+      onDeleteClick: this.#handleDeleteClick
     });
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
@@ -103,14 +106,37 @@ export default class PointPresenter {
   }
 
   #handleFavoriteClick = () => {
-    this.#handleDataChange({...this.#point, isFavorite: !this.#point.isFavorite});
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.PATCH,
+      {...this.#point, isFavorite: !this.#point.isFavorite},
+    );
+  };
+
+  #handleDeleteClick = (point) => {
+    this.#handleDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
+  };
+
+  #handleEditorFormSubmit = (point) => {
+    const isMinorUpdate = !(isDatesEqual(this.#point.dateFrom, point.dateFrom)
+    && isDatesEqual(this.#point.dateTo, point.dateTo))
+    || (this.#point.basePrice !== point.basePrice);
+
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      point
+    );
+    this.#replaceFormToPoint();
   };
 
   #handleOpenPointBoardButtonClick = () => this.#replacePointToForm();
-  #handleClosePointBoardButtonClick = () => this.#replaceFormToPoint();
-
-  #handleEditorFormSubmit = (point) => {
-    this.#handleDataChange(point);
+  #handleClosePointBoardButtonClick = () => {
+    this.#formEditingComponent.reset(this.#point);
     this.#replaceFormToPoint();
   };
 }

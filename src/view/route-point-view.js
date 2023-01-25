@@ -1,6 +1,17 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import {humanizeTravelDay, humanizeTimeFromTo, humanizeTravelTime} from '../utils/utils';
 
+const DEFAULT_POINT = {
+  basePrice: '0',
+  dateFrom: '2019-07-10T22:55:56.845Z',
+  dateTo: '2019-07-11T11:22:13.375Z',
+  destination: 0,
+  id: 123,
+  isFavorite: false,
+  offers: 1,
+  type: 'taxi'
+};
+
 
 function createOffersTemplate(offer) {
   return (
@@ -14,6 +25,7 @@ function createOffersTemplate(offer) {
 
 function createRoutePointTemplate(point, destinations, offersList) {
   const {basePrice, dateFrom, dateTo, destination, isFavorite, offers, type} = point;
+
   const date = humanizeTravelDay(dateFrom);
   const selectedsOffers = offersList.filter((el) => offers.includes(el.id));
   const selectedDestination = destinations.find((el) => el.id === destination);
@@ -68,7 +80,7 @@ export default class RoutePointView extends AbstractView {
   #handleClick = null;
   #handleFavoriteCLick = null;
 
-  constructor({point, destinations, offersList, onClick, onFavoriteClick}) {
+  constructor({point = DEFAULT_POINT, destinations, offersList, onClick, onFavoriteClick}) {
     super();
     this.#point = point;
     this.#destinations = destinations;
