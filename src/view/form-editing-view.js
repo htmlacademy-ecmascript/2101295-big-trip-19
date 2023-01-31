@@ -40,7 +40,7 @@ function createAvailableOffers(offer, selectedsOffers) {
   );
 }
 
-function createFiltersFormTemplate(point, destinations, offersList, offersListByType) {
+function createFiltersFormTemplate(point, destinations, offersList) {
   const {basePrice, dateFrom, dateTo, destination, offers, type} = point;
   const dateStart = humanizeTravelDayForEditing(dateFrom);
   const dateFinish = humanizeTravelDayForEditing(dateTo);
@@ -48,8 +48,11 @@ function createFiltersFormTemplate(point, destinations, offersList, offersListBy
   const dateStartHouse = humanizeTimeFromTo(dateFrom);
   const dateFinishHouse = humanizeTimeFromTo(dateTo);
 
-  const offersByType = offersListByType.find((el) => el.type === type).offers;
-  const selectedsOffers = offersList.filter((el) => offers.includes(el.id));
+  const offersByType = offersList.find((el) => el.type === type).offers;
+  // console.log(offers);
+  // console.log(offersByType);
+  const selectedsOffers = offersByType.filter((el) => offers.includes(el.id));
+  //console.log(offersByType);
   const selectedDestination = destinations.find((el) => el.id === destination);
 
   return (
