@@ -7,23 +7,26 @@ import NewPointPresenter from './new-point-presenter';
 import { filter } from '../utils/filters';
 import {SortType, UserAction, UpdateType, FilterType} from '../const/const';
 import {sortByTime, sortByPrice, sortByDay} from '../utils/utils';
+import LoadingView from '../view/loading-view.js';
 
 
 export default class BoardPresenter {
   #listPointsComponent = new ListPointsView();
   #pointsListEmptyView = null;
   #sortComponent = null;
+  #loadingComponent = new LoadingView();
   #boardContainer = null;
   #pointsModel = null;
   #filterType = FilterType.EVERYTHING;
-  #destinations = null;
-  #offersList = null;
+  #destinations = [];
+  #offersList = [];
   #offersListByType = null;
   #pointsPresenter = new Map();
   #newPointPresenter = null;
   #currentSortType = SortType.DAY;
   #filtersModel = null;
   #boardOffers = null;
+  #isLoading = true;
 
   constructor({boardContainer, pointsModel, filtersModel, onNewPointDestroy}) {
     this.#boardContainer = boardContainer;
@@ -68,7 +71,7 @@ export default class BoardPresenter {
     this.#boardOffers = [...this.#pointsModel.points];
     this.#destinations = [...this.#pointsModel.destinations];
     this.#offersList = [...this.#pointsModel.offers];
-    this.#offersListByType = [...this.#pointsModel.offersByType];
+    //this.#offersListByType = [...this.#pointsModel.offersByType];
     this.#renderPointsList();
   }
 
@@ -84,7 +87,7 @@ export default class BoardPresenter {
 
   #renderEventsList(points) {
     render(this.#listPointsComponent, this.#boardContainer);
-    points.forEach((point) => this.#renderRoutePoint({point, destinations: this.#destinations, offersList: this.#offersList, offersListByType: this.#offersListByType}));
+    points.forEach((point) => this.#renderRoutePoint({point, destinations: this.#pointsModel.destinations, offersList: this.#pointsModel.offers, offersListByType: this.#offersListByType}));
   }
 
   #handleViewAction = (actionType, updateType, update) => {
@@ -104,7 +107,7 @@ export default class BoardPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#pointsPresenter.get(data.id).init(data, this.#destinations, this.#offersList, this.#offersListByType);
+        this.#pointsPresenter.get(data.id).init(data, this.#pointsModel.destinations, this.#pointsModel.offers, this.#offersListByType);
         break;
       case UpdateType.MINOR:
         this.#clearPointsList();
@@ -112,6 +115,11 @@ export default class BoardPresenter {
         break;
       case UpdateType.MAJOR:
         this.#clearPointsList({resetSortType: true});
+        this.#renderPointsList();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderPointsList();
         break;
     }
@@ -122,6 +130,7 @@ export default class BoardPresenter {
     this.#pointsPresenter.clear();
 
     remove(this.#sortComponent);
+    remove(this.#loadingComponent);
     if (this.#pointsListEmptyView) {
       remove(this.#pointsListEmptyView);
     }
@@ -154,8 +163,18 @@ export default class BoardPresenter {
     render(this.#sortComponent, this.#boardContainer);
   }
 
+  #renderLoading() {
+    render(this.#loadingComponent, this.#listPointsComponent.element, RenderPosition.AFTERBEGIN);
+  }
+
   #renderPointsList() {
     render(this.#listPointsComponent, this.#boardContainer);
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     if (this.#pointsModel.points.length === 0) {
       this.#renderNoTasks();
     }

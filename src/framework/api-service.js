@@ -27,7 +27,6 @@ export default class ApiService {
     headers = new Headers(),
   }) {
     headers.append('Authorization', this._authorization);
-
     const response = await fetch(
       `${this._endPoint}/${url}`,
       {method, body, headers},
@@ -39,6 +38,7 @@ export default class ApiService {
     } catch (err) {
       ApiService.catchError(err);
     }
+
   }
 
   /**
