@@ -1,6 +1,5 @@
 import {remove, render, RenderPosition} from '../framework/render.js';
 import FormEditingView from '../view/form-editing-view';
-import {nanoid} from 'nanoid';
 import {UserAction, UpdateType} from '../const/const';
 
 export default class NewWaypointPresenter {
@@ -25,7 +24,6 @@ export default class NewWaypointPresenter {
       destinations: destinations,
       offersList: offersList,
       offersListByType: offersListByType,
-      //formType:'add',
       onFormSubmit: this.#handleFormSubmit,
       onDeleteClick: this.#handleFormReset,
     });
@@ -45,11 +43,30 @@ export default class NewWaypointPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
+  setSaving() {
+    this.#pointsAddComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this.#pointsAddComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#pointsAddComponent.shake(resetFormState);
+  }
+
   #handleFormSubmit = (point) => {
     this.#handleDataChange(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      {id: nanoid(), ...point},
+      point,
     );
     this.destroy();
   };

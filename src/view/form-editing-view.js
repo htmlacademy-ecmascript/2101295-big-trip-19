@@ -1,23 +1,21 @@
 import AbstractStatefulView from '../framework//view/abstract-stateful-view';
 import { humanizeTimeFromTo, humanizeTravelDayForEditing} from '../utils/utils';
-import {DESTINATION} from '../mock/mocks-const';
 import flatpickr from 'flatpickr';
-import {CITIES} from '../mock/mocks-const';
 import 'flatpickr/dist/flatpickr.min.css';
+import he from 'he';
 
 const DEFAULT_POINT = {
   basePrice: '0',
   dateFrom: '2019-07-10T22:55:56.845Z',
   dateTo: '2019-07-11T11:22:13.375Z',
-  destination: 0,
-  id: '123',
+  destination: 1,
   isFavorite: false,
   offers: [],
   type: 'taxi'
 };
 
-function createDestinationListTemplate() {
-  return DESTINATION.map((city) => `<option value="${city.name}"></option>`).join('');
+function createDestinationListTemplate(destinations) {
+  return destinations.map((destination) => `<option value="${he.encode(destination.name)}"></option>`).join('');
 }
 
 function createPhotosTape(srcPhoto) {
@@ -25,12 +23,12 @@ function createPhotosTape(srcPhoto) {
     `<img class="event__photo" src="${srcPhoto}" alt="Event photo"></img>`
   );
 }
-function createAvailableOffers(offer, selectedsOffers) {
+function createAvailableOffers(offer, selectedsOffers, isDisabled) {
   const isChecked = selectedsOffers.some((el) => el.id === offer.id);
 
   return (
     `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${isChecked ? 'checked' : ''}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
         <label class="event__offer-label" for="event-offer-luggage-1">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
@@ -41,7 +39,8 @@ function createAvailableOffers(offer, selectedsOffers) {
 }
 
 function createFiltersFormTemplate(point, destinations, offersList) {
-  const {basePrice, dateFrom, dateTo, destination, offers, type} = point;
+  const {basePrice, dateFrom, dateTo, destination, offers, type, isDisabled, isSaving, isDeleting} = point;
+
   const dateStart = humanizeTravelDayForEditing(dateFrom);
   const dateFinish = humanizeTravelDayForEditing(dateTo);
 
@@ -49,10 +48,7 @@ function createFiltersFormTemplate(point, destinations, offersList) {
   const dateFinishHouse = humanizeTimeFromTo(dateTo);
 
   const offersByType = offersList.find((el) => el.type === type).offers;
-  // console.log(offers);
-  // console.log(offersByType);
   const selectedsOffers = offersByType.filter((el) => offers.includes(el.id));
-  //console.log(offersByType);
   const selectedDestination = destinations.find((el) => el.id === destination);
 
   return (
@@ -122,9 +118,9 @@ function createFiltersFormTemplate(point, destinations, offersList) {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${selectedDestination.name}" list="destination-list-1" required>
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${selectedDestination?.name}" list="destination-list-1" required ${isDisabled ? 'disabled' : ''}>
           <datalist id="destination-list-1">
-            ${createDestinationListTemplate()}
+            ${createDestinationListTemplate(destinations)}
           </datalist>
         </div>
 
@@ -144,8 +140,12 @@ function createFiltersFormTemplate(point, destinations, offersList) {
           <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}" required>
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>
+          ${isSaving ? 'Saving...' : 'Save'}
+        </button>
+        <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+          ${isDeleting ? 'Deleting...' : 'Delete'}
+          </button>
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
         </button>
@@ -161,10 +161,10 @@ function createFiltersFormTemplate(point, destinations, offersList) {
 
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${selectedDestination.description}</p>
+          <p class="event__destination-description">${selectedDestination?.description}</p>
           <div class="event__photos-container">
               <div class="event__photos-tape">
-              ${selectedDestination.pictures.map((el) => createPhotosTape(el.src)).join('')}
+              ${selectedDestination?.pictures.map((el) => createPhotosTape(el.src)).join('')}
             </div>
         </section>
       </section>
@@ -183,12 +183,11 @@ export default class FormEditingView extends AbstractStatefulView {
   #endDatePicker = null;
   #handleDeleteClick = null;
 
-  constructor ({point = DEFAULT_POINT, destinations, offersList, offersListByType, onClick, onFormSubmit, onDeleteClick}) {
+  constructor ({point = DEFAULT_POINT, destinations, offersList, onClick, onFormSubmit, onDeleteClick}) {
     super();
     this._setState(FormEditingView.parsePointToState(point));
     this.#destinations = destinations;
     this.#offersList = offersList;
-    this.#offersListByType = offersListByType;
     this.#handleClick = onClick;
     this.#handleEditorFormSubmit = onFormSubmit;
     this._restoreHandlers();
@@ -208,7 +207,7 @@ export default class FormEditingView extends AbstractStatefulView {
   }
 
   get template() {
-    return createFiltersFormTemplate(this._state, this.#destinations, this.#offersList, this.#offersListByType);
+    return createFiltersFormTemplate(this._state, this.#destinations, this.#offersList);
   }
 
   reset(point) {
@@ -227,12 +226,20 @@ export default class FormEditingView extends AbstractStatefulView {
   }
 
   static parsePointToState(point) {
-    return {...point
+    return {...point,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
     };
   }
 
   static parseStateToPoint(state){
     const point = {...state};
+
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
+
     return point;
   }
 
@@ -259,14 +266,16 @@ export default class FormEditingView extends AbstractStatefulView {
     this.element.querySelector('.event__save-btn').disabled = true;
     evt.preventDefault();
     this._setState({
-      basePrice: evt.target.value
+      basePrice: Number(evt.target.value)
     });
   };
 
   #eventChangeDestinationHandler = (evt) => {
+    const CITIES = [];
+    this.#destinations.forEach((destination) => CITIES.push(destination.name));
     if (CITIES.includes(evt.target.value)) {
       this.updateElement({
-        destination: CITIES.indexOf(evt.target.value)
+        destination: CITIES.indexOf(evt.target.value) + 1,
       });
     } else {evt.target.value = ''; evt.target.placeholder = 'выберите из списка';}
 

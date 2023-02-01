@@ -66,7 +66,8 @@ export default class PointPresenter {
     }
 
     if (this.#mode === Mode.EDITING) {
-      replace(this.#formEditingComponent, prevPointEditComponent);
+      replace(this.#routePointComponent, prevPointEditComponent);
+      this.#mode = Mode.DEFAULT;
     }
 
     remove(prevPointComponent);
@@ -85,12 +86,47 @@ export default class PointPresenter {
     remove(this.#formEditingComponent);
   }
 
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#formEditingComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#formEditingComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.#replaceFormToPoint();
     }
   };
+
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#routePointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#formEditingComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#formEditingComponent.shake(resetFormState);
+  }
 
   #replacePointToForm () {
     replace(this.#formEditingComponent, this.#routePointComponent);
@@ -131,7 +167,6 @@ export default class PointPresenter {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       point
     );
-    this.#replaceFormToPoint();
   };
 
   #handleOpenPointBoardButtonClick = () => this.#replacePointToForm();
