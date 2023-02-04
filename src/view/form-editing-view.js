@@ -23,13 +23,17 @@ function createPhotosTape(srcPhoto) {
     `<img class="event__photo" src="${srcPhoto}" alt="Event photo"></img>`
   );
 }
-function createAvailableOffers(offer, selectedsOffers, isDisabled) {
+function createAvailableOffers(offer, selectedsOffers) {
   const isChecked = selectedsOffers.some((el) => el.id === offer.id);
 
   return (
     `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
-        <label class="event__offer-label" for="event-offer-luggage-1">
+      <input class="event__offer-checkbox  visually-hidden"
+        id="event-offer-luggage-${offer.id}"
+        type="checkbox"
+        name="event-offer-luggage"
+        ${isChecked ? 'checked' : ''}>
+        <label class="event__offer-label" for="event-offer-luggage-${offer.id}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
           <span class="event__offer-price">${offer.price}</span>
@@ -176,7 +180,6 @@ function createFiltersFormTemplate(point, destinations, offersList) {
 export default class FormEditingView extends AbstractStatefulView {
   #destinations = null;
   #offersList = null;
-  #offersListByType = null;
   #handleClick = null;
   #handleEditorFormSubmit = null;
   #startDatePicker = null;
@@ -222,6 +225,9 @@ export default class FormEditingView extends AbstractStatefulView {
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#eventChangeDestinationHandler);
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
 
+    this.element.querySelectorAll('.event__offer-selector')
+      .forEach((offer) => offer.addEventListener('change', this.#offerChangeHandler));
+
     this.#setDatePickers();
   }
 
@@ -259,6 +265,22 @@ export default class FormEditingView extends AbstractStatefulView {
       this.updateElement({
         type: inputElement.value
       });
+    }
+  };
+
+  #offerChangeHandler = (evt) => {
+    evt.preventDefault();
+    if (evt.target.tagName === 'INPUT') {
+      const checkedOfferId = Number(evt.target.id[20]);
+      const checkedOfferIndex = this._state.offers.indexOf(checkedOfferId);
+      if (checkedOfferIndex === -1) {
+        this._state.offers.push(checkedOfferId);
+        return;
+      }
+      this._state.offers = [
+        ...this._state.offers.slice(0, checkedOfferIndex),
+        ...this._state.offers.slice(checkedOfferIndex + 1),
+      ];
     }
   };
 
