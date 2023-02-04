@@ -1,22 +1,15 @@
 import Observable from '../framework/observable.js';
-//import {getPoint} from '../mock/points';
-//import {destinations} from '../mock/destinstion';
 import {UpdateType} from '../const/const';
-import {offersListByType} from '../mock/offer';
-
 
 export default class PointsModel extends Observable {
   #points = [];
   #destinations = [];
   #offersList = [];
-  #offersListByType = offersListByType;
   #pointsApiService = null;
 
   constructor({pointsApiService}) {
     super();
     this.#pointsApiService = pointsApiService;
-    //this.#pointsApiService.points.then((point) => console.log(point.map(this.#adaptToClient)));
-    //this.#pointsApiService.destinations.then((point) => console.log(point));
   }
 
   get points() {
@@ -107,7 +100,6 @@ export default class PointsModel extends Observable {
   }
 
   get destinations() {
-    //console.log(this.#destinations);
     return this.#destinations;
   }
 
