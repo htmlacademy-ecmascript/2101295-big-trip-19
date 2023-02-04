@@ -290,6 +290,9 @@ export default class FormEditingView extends AbstractStatefulView {
     this._setState({
       basePrice: Number(evt.target.value)
     });
+    if (this._state.basePrice > 0) {
+      this.element.querySelector('.event__save-btn').disabled = false;
+    }
   };
 
   #eventChangeDestinationHandler = (evt) => {
