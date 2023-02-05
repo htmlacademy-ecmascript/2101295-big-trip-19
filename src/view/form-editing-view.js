@@ -5,7 +5,7 @@ import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';
 
 const DEFAULT_POINT = {
-  basePrice: '0',
+  basePrice: 1,
   dateFrom: '2019-07-10T22:55:56.845Z',
   dateTo: '2019-07-11T11:22:13.375Z',
   destination: 1,
@@ -285,13 +285,16 @@ export default class FormEditingView extends AbstractStatefulView {
   };
 
   #pointPriceInputHandler = (evt) => {
-    this.element.querySelector('.event__save-btn').disabled = true;
     evt.preventDefault();
+    this.element.querySelector('.event__save-btn').disabled = true;
     this._setState({
       basePrice: Number(evt.target.value)
     });
     if (this._state.basePrice > 0) {
+      this.element.querySelector('.event__input--price').style.background = 'white';
       this.element.querySelector('.event__save-btn').disabled = false;
+    } else {
+      this.element.querySelector('.event__input--price').style.background = 'red';
     }
   };
 

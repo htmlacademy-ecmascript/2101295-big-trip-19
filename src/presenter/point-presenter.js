@@ -170,6 +170,7 @@ export default class PointPresenter {
   };
 
   #handleOpenPointBoardButtonClick = () => this.#replacePointToForm();
+
   #handleClosePointBoardButtonClick = () => {
     this.#formEditingComponent.reset(this.#point);
     this.#replaceFormToPoint();

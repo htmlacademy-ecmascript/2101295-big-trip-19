@@ -18,16 +18,27 @@ const pointsModel = new PointsModel({
   pointsApiService: new PointsApiService(END_POINT, AUTHORIZATION)
 });
 const filtersModel = new FiltersModel();
-const boardPresenter = new BoardPresenter({boardContainer: siteCotentPlace, pointsModel, filtersModel, onNewPointDestroy: handleNewEventFormClose});
+const boardPresenter = new BoardPresenter({
+  boardContainer: siteCotentPlace,
+  pointsModel,
+  filtersModel,
+  onNewPointDestroy: handleNewPointFormClose,
+  handleAddPointButtonStatus: handleNewPointButtonStatus
+});
 
-const newPointButtonComponent = new NewPointButtonView({onClick: handleAddWaypoinButtonClick});
-function handleAddWaypoinButtonClick (){
+const newPointButtonComponent = new NewPointButtonView({onClick: handleNewPointButtonClick});
+
+function handleNewPointButtonClick (){
   boardPresenter.createPoints();
-  newPointButtonComponent.element.disabled = true;
+  handleNewPointButtonStatus(true);
 }
 
-function handleNewEventFormClose (){
-  newPointButtonComponent.element.disabled = false;
+function handleNewPointFormClose (){
+  handleNewPointButtonStatus(false);
+}
+
+function handleNewPointButtonStatus (value){
+  newPointButtonComponent.element.disabled = value;
 }
 
 
