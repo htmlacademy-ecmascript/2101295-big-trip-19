@@ -9,6 +9,9 @@ import {SortType, UserAction, UpdateType, FilterType} from '../const/const';
 import {sortByTime, sortByPrice, sortByDay} from '../utils/utils';
 import LoadingView from '../view/loading-view.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+//import ErrorPresenter from './error-presenter';
+import ErrorView from '../view/error-view';
+
 
 const TimeLimit = {
   LOWER_LIMIT: 350,
@@ -17,6 +20,7 @@ const TimeLimit = {
 export default class BoardPresenter {
   #listPointsComponent = new ListPointsView();
   #pointsListEmptyView = null;
+  #errorComponent = new ErrorView;
   #sortComponent = null;
   #loadingComponent = new LoadingView();
   #boardContainer = null;
@@ -29,17 +33,19 @@ export default class BoardPresenter {
   #newPointPresenter = null;
   #currentSortType = SortType.DAY;
   #filtersModel = null;
-  #boardOffers = null;
   #isLoading = true;
+  #handleNewPointButtonStatus = null;
+  #isLoadingError = false;
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
     upperLimit: TimeLimit.UPPER_LIMIT
   });
 
-  constructor({boardContainer, pointsModel, filtersModel, onNewPointDestroy}) {
+  constructor({boardContainer, pointsModel, filtersModel, onNewPointDestroy, handleAddPointButtonStatus: handleNewPointButtonStatus}) {
     this.#boardContainer = boardContainer;
     this.#pointsModel = pointsModel;
     this.#filtersModel = filtersModel;
+    this.#handleNewPointButtonStatus = handleNewPointButtonStatus;
 
     this.#newPointPresenter = new NewPointPresenter({
       pointListContainer: this.#listPointsComponent.element,
@@ -76,7 +82,6 @@ export default class BoardPresenter {
   }
 
   init() {
-    this.#boardOffers = [...this.#pointsModel.points];
     this.#destinations = [...this.#pointsModel.destinations];
     this.#offersList = [...this.#pointsModel.offers];
     this.#renderPointsList();
@@ -146,8 +151,20 @@ export default class BoardPresenter {
         remove(this.#loadingComponent);
         this.#renderPointsList();
         break;
+      case UpdateType.ERROR:
+        this.#isLoading = false;
+        this.#isLoadingError = true;
+        this.#renderErrorComponent(data);
+        this.#clearPointsList({resetSortType: true});
+        this.#handleNewPointButtonStatus(true);
+        break;
     }
   };
+
+  #renderErrorComponent(data) {
+    this.#errorComponent = new ErrorView(data);
+    render(this.#errorComponent, this.#listPointsComponent.element, RenderPosition.AFTERBEGIN);
+  }
 
   #clearPointsList({resetSortType = false} = {}) {
     this.#pointsPresenter.forEach((presenter) => presenter.destroy());
@@ -199,8 +216,9 @@ export default class BoardPresenter {
       return;
     }
 
-    if (this.#pointsModel.points.length === 0) {
+    if (this.#pointsModel.points.length === 0 && this.#isLoadingError === false) {
       this.#renderNoTasks();
+      return;
     }
     this.#renderSort();
     this.#renderEventsList(this.points);

@@ -26,6 +26,7 @@ export default class NewWaypointPresenter {
       offersListByType: offersListByType,
       onFormSubmit: this.#handleFormSubmit,
       onDeleteClick: this.#handleFormReset,
+      onClick: this.#handleFormReset,
     });
 
     render(this.#pointsAddComponent, this.#pointsListContainer, RenderPosition.AFTERBEGIN);
